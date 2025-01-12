@@ -1,0 +1,295 @@
+@charset "UTF-8";
+
+.description table td,
+.description table th{
+	padding: 2px;
+}
+
+.description table {
+	margin-bottom: 0;
+}
+
+header, footer {
+	max-width: 800px;
+	width:100%;
+	margin: 0 auto;
+  	font-family: 'Helvetica Neue',sans-serif !important;
+  	font-size: 12px !important;
+  	text-align: center;
+  	z-index:1;
+  	background-color: rgb(255,255,255,0.5); 
+  	left: 0;
+  	right: 0;
+}
+
+header form {
+	margin: 5px;
+	margin-bottom: 5px;
+	padding: 5px;
+	background-color: white;
+}
+
+header {
+	position: fixed;
+	top: 0;
+}
+
+#address {
+	max-width: 400px;
+	width: 100%;
+	margin: 0 auto;
+	height: 33px;
+}
+header form button {
+	margin-left: 10px; 
+}
+
+footer {
+	position: fixed;
+	bottom: 0;
+}
+
+footer #detail, #wait, #alert{
+	margin: 0px;
+	margin-top: 5px;
+	padding: 5px;
+	background-color: white;
+}
+
+#alert h6{
+	color: red;
+}
+
+footer #detail #street,
+footer #detail #satellite{
+	padding: 0;
+	margin: 5 auto;
+	height: 200px;
+	width: 100%;
+}
+
+footer #detail #canvas{
+	background-color: white; 
+	height: 110px;
+	width: 110px;
+	margin: 2px;
+}
+
+footer #detail h5 {
+	vertical-align: top;
+}
+
+footer #detail table {
+	vertical-align: top;
+	display: inline-block;
+	margin: 10px;
+}
+footer #detail table td,
+footer #detail table th{
+	padding: 2px;
+	border-bottom: solid 1px grey;
+	font-size: 12px !important;
+}
+
+#dvf {
+	display: inline-block;
+	height: 20em;
+	overflow-y: scroll;
+}
+
+.table-scroll thead th {
+	position: sticky;
+	top: 0;
+	background-color: whitesmoke;
+}
+
+/* 
+footer #detail table #head-dvf{
+	table-layout: fixed;
+	border-collapse: collapse;
+	display: block;
+}
+
+footer #detail table #body-dvf{
+	table-layout: fixed;
+	height: 150px;
+	border-collapse: collapse;
+	overflow-y: scroll;
+	display: block;
+}
+*/
+footer #detail table #body-dvf td,
+footer #detail table #head-dvf th{
+	width: 7%;
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#head-dvf th:nth-child(1),
+#body-dvf td:nth-child(1),
+#head-dvf th:nth-child(2),
+#body-dvf td:nth-child(2),
+#head-dvf th:nth-child(3),
+#body-dvf td:nth-child(3),
+#head-dvf th:nth-child(6),
+#body-dvf td:nth-child(6){
+    width: 100px;    
+}  
+
+
+footer #detail h6 {
+	margin: 5px;
+}
+
+footer #detail h5 button {
+	padding: 2px;
+    margin: 0 5px;
+}
+footer #detail h5 {
+    margin: 0;
+}
+footer #detail ul {
+	float: left;
+	margin: 0;
+	padding: 0;
+}
+
+footer #detail ul li {
+	padding: 5px;
+	display: inline-block;
+	list-style-type: none;
+	border: solid 1px white;
+}
+footer #detail ul li.inactive:hover {
+	cursor: pointer;
+}
+
+footer #detail ul li.inactive {
+	background: lightgrey;
+}
+
+.close-corner {
+	position: absolute;
+    right: 10px;
+    font-size: 16px !important;
+}
+
+#content {
+	padding: 0;
+}
+
+.mapboxgl-ctrl-attrib,
+.mapboxgl-ctrl {
+	display: none!important;
+}
+
+#map{
+	padding: 0;
+	height: 100vh;
+	width: 100%;
+	background-color: white; 
+}
+
+.hidden {
+	display: none!important;
+}
+
+a[href^="http://maps.google.com/maps"]{display:none !important}
+a[href^="https://maps.google.com/maps"]{display:none !important}
+
+.gmnoprint a, .gmnoprint span, .gm-style-cc {
+    display:none;
+}
+.gmnoprint div {
+    background:none !important;
+}
+
+.gm-iv-address {
+	background: none;
+}
+
+#popup-filters h4 a {
+	float: right;
+}
+#popup-filters .modal-dialog{
+	z-index: 99;
+	max-width: 350px;
+	margin: 20px auto!important;
+}
+#popup-filters button {
+	margin: 5px;
+}
+#popup-filters input{
+	border: solid 1px lightgrey;
+	width: 50px;
+	margin: 5px;
+	text-align: center;
+}
+
+/* *** MAP *** */
+
+td.pallette {
+	height: 10px!important;
+}
+
+.map-overlay { 
+	z-index: 98; 
+	text-align: center;
+	font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: 5px;
+	font-weight: 500!important;
+}
+
+.map-overlay-btn {
+	z-index: 98; 
+	text-align: center;
+	font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	padding: 5px 8px;
+	font-weight: 500!important;
+	border-radius: 3px;
+	margin: 10px;
+}
+
+.map-overlay .map-overlay-inner {
+	border-radius: 3px;
+	padding: 5px;
+	margin-bottom: 5px;
+}
+
+.map-overlay .card {
+	background-color: rgba(255,255,255,0.7);
+}
+
+.map-overlay .card-body {
+	padding: 7px;
+}
+
+.map-overlay hr {
+	margin: 6px 0px;
+}
+
+.mapboxgl-ctrl-attrib,
+.mapboxgl-ctrl {
+	display: none!important;
+}
+
+#poids-form .form-check-label{
+	border-left-style: solid;
+	border-left-width: 5px;
+	padding-left: 5px;
+}
+
+#puce-form .form-check-label{
+	padding-left: 5px;
+}
+
+#chaise-form .form-check-label{
+	padding-left: 5px;
+}

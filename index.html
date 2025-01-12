@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+	<!--<![endif]-->
+	<head>
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">		
+		<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1" /> -->
+		<link rel="shortcut icon" href="favicon.ico" type='image/x-icon'/>
+		<link rel="icon" href="favicon.ico" type="image/x-icon"/>
+		<title>Rendement locatif</title>
+		
+		<link href="/main.css" rel="stylesheet" />
+
+		<!-- DIVERS		 -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		<script src="https://cdn.staticfile.org/tether/1.4.0/js/tether.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+	  rel="stylesheet">
+	  
+		<!-- MAPBOX -->
+		<script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.js"></script>
+		<link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.css" rel="stylesheet" />
+
+		<script>
+			if (!Array.prototype.findIndex) {
+			  Array.prototype.findIndex = function(predicate) {
+				if (this == null) {
+				  throw new TypeError('Array.prototype.findIndex called on null or undefined');
+				}
+				if (typeof predicate !== 'function') {
+				  throw new TypeError('predicate must be a function');
+				}
+				var list = Object(this);
+				var length = list.length >>> 0;
+				var thisArg = arguments[1];
+				var value;
+
+				for (var i = 0; i < length; i++) {
+				  value = list[i];
+				  if (predicate.call(thisArg, value, i, list)) {
+					return i;
+				  }
+				}
+				return -1;
+			  };
+			}
+		</script>
+	</head>
+	<body>
+		<div id="map">
+			<div>
+				<div class='map-overlay top'>
+					<div class='map-overlay-inner'>
+						<div class="card">
+							<div class="card-body text-left">
+								<table>
+									<tbody>
+										<tr><td colspan="6"><strong>RENDEMENT > <span id="val-rendement"></span>%</strong></td></tr>
+										<tr>
+											<td class="pallette" style="background-color: #dbf0c1;"></td>
+											<td class="pallette" style="background-color: #d5d78d;"></td>
+											<td class="pallette" style="background-color: #dab852;"></td>
+											<td class="pallette" style="background-color: #e09106;"></td>
+											<td class="pallette" style="background-color: #e35f00;"></td>
+											<td class="pallette" style="background-color: #da0b0b;"></td>
+										</tr>
+										<tr><td colspan="6">
+											<div style="padding-top: 5px;">
+												<input class="w-100" id="slider-rendement" type="range" min="0" max="14" step="2" value="8" onchange="refreshMapView()"/>
+											</div>
+										</td></tr>
+										<tr><td colspan="6"><strong>TRAJET < <span id="val-trajet"></span> minutes</strong></td></tr>
+										<tr><td colspan="6">
+											<input class="w-100" id="slider-trajet" type="range" min="0" max="180" step="10" value="60" onchange="refreshMapView()"/>
+										</td></tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>		
+		</div>
+		<noscript>
+			<div id="page-container">
+				<div class="text-center p-t-30 p-b-20 bg-white">
+					<h4 class="m-t-20 text-default"><em>Cette page nécessite l'activation du javascript dans votre navigateur.</em></h4>
+				</div>    
+			</div>
+		</noscript>
+	</body>
+	<script type="text/javascript">
+
+		// * FUNCTIONS *
+		// First, checks if it isn't implemented yet.
+		if (!String.prototype.format) {
+			String.prototype.format = function() {
+				var args = arguments;
+				return this.replace(/{(\d+)}/g, function(match, number) { 
+				return typeof args[number] != 'undefined'
+					? args[number]
+					: match
+				;
+				});
+			};
+		}
+		
+		
+		// Map
+		mapboxgl.accessToken = "pk.eyJ1IjoiYW50aGlsbCIsImEiOiJUR0FoRGdJIn0.ZygA4KxIt8hJ1LAvPPMHwQ";
+		
+		let data = {};
+		let map = new mapboxgl.Map({
+			container: "map",
+			style: "mapbox://styles/mapbox/satellite-v9",
+			zoom: 7,
+			center: [-0.6561809,44.8637065],
+		});
+
+		const scale = [
+			"#dbf0c1", // < 4%
+			"#d5d78d", // < 6%,
+			"#dab852", // < 8%,
+			"#e09106 ", // < 10%
+			"#e35f00", // < 12%
+			"#da0b0b" // > 14%
+		]
+
+		function getColor(val){
+			if(val==null || val <= 0.04) return scale[0];
+			if(val <= 0.06) return scale[1];
+			if(val <= 0.08) return scale[2];
+			if(val <= 0.10) return scale[3];
+			if(val <= 0.12) return scale[4];
+			return scale[5]; 
+		}
+
+		map.on("load", function() {
+
+			["ville"]	
+			.forEach(function(source){	
+				map.addSource(source, {	
+					"type": "geojson",	
+					"data": {			
+						"type": "FeatureCollection",	
+						"features": []	
+					}	
+				});	
+			})	
+			
+			map.addLayer({	
+				"id": "ville",	
+				"type": "circle",	
+				"source": "ville",	
+				"minzoom": 7,
+				"paint": {
+					"circle-radius": 7,
+					"circle-color": ['get', 'color'],
+					'circle-opacity': ['get', 'opacity'], 
+					"circle-stroke-color": ['get', 'border'],
+					"circle-stroke-width": 1.5,
+				}
+			});	
+
+			map.addLayer({
+				"id": "ville-label",
+				"type": "symbol",
+				"source": "ville",
+				"minzoom": 9,
+				"layout": {
+					"visibility": "visible",
+					"text-offset": [0, 1],
+					"text-anchor": "top",
+					"text-field": "{name}",
+					"text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+					"text-size": 12
+				},
+				"paint": {
+					"text-color":  "white",
+					"text-opacity": ['get', 'opacity'],
+					"text-halo-color":["get","l-color"],
+					"text-halo-width": 0.5
+				}	
+			});
+
+			$.getJSON("./export-rendement-min.json", function(json) {
+			
+				data = json;
+				refreshMapView()
+			});
+		});
+
+
+		const refreshMapView = () => {
+
+			const filterRendement = document.getElementById("slider-rendement").value;
+			document.getElementById("val-rendement").innerText = filterRendement;
+			const filterTrajet = document.getElementById("slider-trajet").value;
+			document.getElementById("val-trajet").innerText = filterTrajet;
+
+			let result = {};
+			result["ville"] = {"type": "FeatureCollection"};
+			result["ville"]["features"] = Object.keys(data)
+			.map(key => {
+
+				const city = data[key];
+				const filtered = (city["Rendement"] >= filterRendement/100) && (city["duree_min"] < filterTrajet)
+				let feature = {
+					"type": "Feature",
+					"geometry": {
+						"type": "Point",
+						"coordinates": [city.lng, city.lat]
+					},
+					"properties": {
+						"name": city["Ville"],
+						"color": getColor(city["Rendement"]),
+						"opacity": filtered ? 1:0.3,
+						"l-color": filtered ? "black":"gray",
+						"border": filtered ? "black":"gray",
+						"description": city["Ville"]
+					}
+				};
+				["CP","Loyer","Loyer bas","Loyer haut","Loyer médian","Prix bas","Prix haut","Prix médian","Rendement","Ville","distance_km","duree_min"]
+				.forEach((prop) => { feature["properties"][prop] = city[prop]});
+
+				// RESUME
+				let description = `<div class="description text-black p-0 text-left">
+										<table class="table map-popup-content">
+											<thead>
+												<tr><th colspan="2" style="border-bottom: solid {7} 2px;border-top: none;">
+													<span class="font-weight-bold "><strong>{0} ({1})</strong></span>
+												</th></tr>
+											</thead>
+											<tbody>
+												<tr><th>Rendement</th><td>{2}%</td></tr>
+												<tr><th>Prix médian</th><td>{3} €/m<sup>2</sup></td></tr>
+												<tr><th>Loyer mensuel</th><td>{4} €/m<sup>2</sup></td></tr>
+												<tr><th>Distance trajet</th><td>{5} Km</td></tr>
+												<tr><th>Durée trajet</th><td>{6} Min</td></tr>
+												</tr>
+											</tbody>
+										</table>
+									</div>`.format(city["Ville"],city["CP"],
+													(city["Rendement"]*100).toFixed(2), 
+													city["Prix médian"], 
+													city["Loyer"],
+													city["distance_km"],
+													city["duree_min"],
+													getColor(city["Rendement"])
+													);
+				feature["properties"]["description"] = description;
+												
+				return feature;
+			});
+			
+			Object.keys(result)
+			.forEach((layer) => {
+				// console.log(result[layer]);
+				map.getSource(layer).setData(result[layer]);
+			});
+
+			map.on("click", "ville", (e) => {
+
+				// Copy coordinates array.
+				const coordinates = e.features[0].geometry.coordinates.slice();
+				const description = e.features[0].properties.description;
+				
+				// Ensure that if the map is zoomed out such that multiple
+				// copies of the feature are visible, the popup appears
+				// over the copy being pointed to.
+				while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+					coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+				}
+				
+				new mapboxgl.Popup()
+					.setLngLat(coordinates)
+					.setHTML(description)
+					.addTo(map);
+			});
+				
+			// Change the cursor to a pointer when the mouse is over the places layer.
+			map.on("mouseenter", "ville", () => {
+				map.getCanvas().style.cursor = "pointer";
+			});
+				
+			// Change it back to a pointer when it leaves.
+			map.on("mouseleave", "ville", () => {
+				map.getCanvas().style.cursor = "";
+			});
+		};
+
+	</script>
+</html>
